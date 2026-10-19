@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RMS native widget preview — UI verification only</title>
+  <link rel="stylesheet" href="../integration/rms-overlay/src/main/resources/static/vendor/n8n-chat/1.42.6/style.css">
+  <link rel="stylesheet" href="../integration/rms-overlay/src/main/resources/static/css/rms-chat.css">
+  <style>
+    body { margin: 0; color: #243b2d; font: 16px/1.6 "Segoe UI", sans-serif; background: #f5f8f5; }
+    header { padding: 20px 24px; border-bottom: 1px solid #dce6dd; background: white; }
+    main { max-width: 800px; padding: 48px 24px 120px; margin: auto; }
+    h1 { font-size: 32px; line-height: 1.2; }
+    p { max-width: 65ch; }
+    a { color: #2e5a45; }
+  </style>
+</head>
+<body>
+  <header>RMS widget integration preview</header>
+  <main>
+    <h1>Native chat widget preview</h1>
+    <p>This page verifies local assets, layout, keyboard controls and the widget's native error state. It does not contain real vacancies or prove a working AI integration.</p>
+    <p>The bottom-right button opens the unmodified @n8n/chat interface with scoped RMS colours. Its test endpoint deliberately has no chatbot workflow.</p>
+    <a href="#preview-note">A representative page link</a>
+    <p id="preview-note">CV upload appears here solely to inspect the native control. Do not submit a real CV on this preview page.</p>
+  </main>
+  <script type="module" src="../integration/rms-overlay/src/main/resources/static/js/rms-chat.js"
+          data-rms-chat-loader data-local-ollama="true" data-webhook-url="http://localhost:5678/webhook/rms-preview-unavailable/chat"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+In the EXISTING RMS file:
+src/main/resources/templates/fragments/layout/public-topbar.html
+
+Insert this one line immediately after the existing public-topbar.js script,
+inside <header th:fragment="topbar(activeNav, onLanding)"> and before </header>:
+
+  <th:block th:replace="~{fragments/rms-chat :: chat}"></th:block>
+
+Copy integration/rms-overlay/src/main/resources/ into the corresponding RMS
+src/main/resources/ directory first. Do not replace public-topbar.html with a
+second copy. The loader mounts the native widget under document.body so it
+does not inherit the sticky header's positioning.
+
+Configuration is disabled by default:
+  rms.chat.enabled=false
+  rms.chat.local-ollama=false
+  rms.chat.webhook-url=http://localhost:5678/webhook/6ddb94d7-27d2-4550-88a2-f7a01a1bb645/chat
+
+Enable rms.chat.local-ollama=true only after selecting/configuring the supplied
+local Ollama workflow. That flag enables PDF upload and the local-processing
+privacy notice. Do not set it true for an external AI provider.
+
+After importing the configured workflow, selecting local credentials and
+publishing it, set rms.chat.enabled=true and restart RMS. Use Spring Boot
+configuration overrides (for example --rms.chat.enabled=true); no secret is
+required by the page. The webhook must be reachable by the candidate browser.
+
+This staged overlay does not prove that RMS or n8n runs. Validate with the
+integration test instructions before calling the chatbot operational.

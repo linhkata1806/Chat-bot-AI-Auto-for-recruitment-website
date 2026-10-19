@@ -1,0 +1,30 @@
+{
+  "workflowId": "TestNativePdf001",
+  "status": "success",
+  "scope": "Synthetic PDF through production Validate request, native Extract PDF Text, and production Readable PDF? gate",
+  "validator": {
+    "valid": true,
+    "hasCv": true,
+    "sessionId": "NativeSmokeSession001",
+    "chatInput": "Summarize the synthetic profile."
+  },
+  "readabilityGate": {
+    "trueBranchItems": 1,
+    "falseBranchItems": 0,
+    "passed": true
+  },
+  "extractionSummary": {
+    "extractedLength": 275,
+    "containsKnownText": true,
+    "excerpt": "SYNTHETIC TEST PROFILE. Candidate has experience in Java and Spring.\nSYNTHETIC TEST PROFILE. Candidate has experience in Java and Spring.\nSYNTHETIC TEST PROFILE"
+  },
+  "n8nExecutionStatus": "success",
+  "lastNodeExecuted": "Summarize extracted text",
+  "cliExitCode": 0,
+  "evidence": [
+    ".runtime/test-artifacts/native-stdout.txt",
+    ".runtime/test-artifacts/native-stderr.txt",
+    ".runtime/test-artifacts/native-exit-code.txt"
+  ],
+  "note": "Synthetic-only; no model, external calls, or RMS writes. A PDF.js standardFontDataUrl warning may appear on stderr."
+}

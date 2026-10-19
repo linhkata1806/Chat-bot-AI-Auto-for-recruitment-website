@@ -1,0 +1,105 @@
+{
+  "retrievedDate": "2026-10-19",
+  "retrievalMethod": "Public official template API rendered as JSON in the in-app browser. No workflow was executed.",
+  "files": [
+    {
+      "file": "18105-response.json",
+      "sourceUrl": "https://api.n8n.io/workflows/templates/18105",
+      "pageUrl": "https://n8n.io/workflows/18105-match-cvs-to-remote-jobs-with-groq-google-sheets-and-gmail/",
+      "templateId": 18105,
+      "workflowVersionId": "de055ae3-7044-460a-b7d9-7889185fc7a3",
+      "sha256": "563ec963995a945bc24a0c3dc333eae5e751a95542af4bf9f036b49eada3271e",
+      "preservation": "Displayed API response text, unmodified."
+    },
+    {
+      "file": "18105-workflow.json",
+      "sourceUrl": "https://api.n8n.io/workflows/templates/18105",
+      "pageUrl": "https://n8n.io/workflows/18105-match-cvs-to-remote-jobs-with-groq-google-sheets-and-gmail/",
+      "templateId": 18105,
+      "workflowVersionId": "de055ae3-7044-460a-b7d9-7889185fc7a3",
+      "sha256": "e0d2e83c92f8390b3b30a37891fec3ddb1a3317abe0634c54d8dd3c93c482484",
+      "preservation": "Unmodified workflow object extracted from response.workflow and serialized with indentation; contains upstream credential references but no credential secret values."
+    },
+    {
+      "file": "16681-response.json",
+      "sourceUrl": "https://api.n8n.io/workflows/templates/16681",
+      "pageUrl": "https://n8n.io/workflows/16681-rank-resumes-by-job-description-similarity-using-openrouter-embeddings/",
+      "templateId": 16681,
+      "workflowVersionId": "8e921498-5c85-4e11-b98c-a4298a0b9edd",
+      "sha256": "a0ed5a7701b7f81985bb6946a1471be48e3c8bc4245d40160c1f0fc339b74a29",
+      "preservation": "Displayed API response text, unmodified."
+    },
+    {
+      "file": "16681-workflow.json",
+      "sourceUrl": "https://api.n8n.io/workflows/templates/16681",
+      "pageUrl": "https://n8n.io/workflows/16681-rank-resumes-by-job-description-similarity-using-openrouter-embeddings/",
+      "templateId": 16681,
+      "workflowVersionId": "8e921498-5c85-4e11-b98c-a4298a0b9edd",
+      "sha256": "2a412b1bf04c3858e7e03c68ee40ccf14e2b60081092bac1a6445aee1450badb",
+      "preservation": "Unmodified workflow object extracted from response.workflow and serialized with indentation; contains upstream credential references but no credential secret values."
+    },
+    {
+      "file": "ExtractFromFile.node-2.43.8.ts",
+      "sourceUrl": "https://raw.githubusercontent.com/n8n-io/n8n/n8n%402.43.8/packages/nodes-base/nodes/Files/ExtractFromFile/ExtractFromFile.node.ts",
+      "version": "n8n@2.43.8",
+      "sha256": "fd884cf81f13a46d46562d4d5fc46e62d29bc6704305bbb23fb945578b93c906",
+      "preservation": "Official source downloaded without modification for operation support inspection."
+    },
+    {
+      "file": "ChatTrigger.node-2.43.8.ts",
+      "sourceUrl": "https://raw.githubusercontent.com/n8n-io/n8n/n8n%402.43.8/packages/%40n8n/nodes-langchain/nodes/trigger/ChatTrigger/ChatTrigger.node.ts",
+      "version": "n8n@2.43.8",
+      "sha256": "34148335c094d5a085e7322d0cd00053ce8c30cb1ad7fd9de6bfab18659819ef",
+      "preservation": "Official source downloaded without modification."
+    },
+    {
+      "file": "Agent.node-2.43.8.ts",
+      "sourceUrl": "https://raw.githubusercontent.com/n8n-io/n8n/n8n%402.43.8/packages/%40n8n/nodes-langchain/nodes/agents/Agent/Agent.node.ts",
+      "version": "n8n@2.43.8",
+      "sha256": "6ab0e647172b6fe612ba8185dfb658118a6bf8dbe3b67177fff0b1a9927f64cb",
+      "preservation": "Official source downloaded without modification."
+    },
+    {
+      "file": "AgentV3.node-2.43.8.ts",
+      "sourceUrl": "https://raw.githubusercontent.com/n8n-io/n8n/n8n%402.43.8/packages/%40n8n/nodes-langchain/nodes/agents/Agent/V3/AgentV3.node.ts",
+      "version": "n8n@2.43.8",
+      "sha256": "4c519748f190af7d62518e411b4f771836f017a81fae997b344184759e96185a",
+      "preservation": "Official source downloaded without modification."
+    },
+    {
+      "file": "ToolsAgentV3-description-2.43.8.ts",
+      "sourceUrl": "https://raw.githubusercontent.com/n8n-io/n8n/n8n%402.43.8/packages/%40n8n/nodes-langchain/nodes/agents/Agent/agents/ToolsAgent/V3/description.ts",
+      "version": "n8n@2.43.8",
+      "sha256": "0df7344dc3a3eff76208005998d1ad189936a8e485dfac2f26e423711a9862af",
+      "preservation": "Official source downloaded without modification."
+    },
+    {
+      "file": "chat-README-2.43.8.md",
+      "sourceUrl": "https://raw.githubusercontent.com/n8n-io/n8n/n8n%402.43.8/packages/frontend/%40n8n/chat/README.md",
+      "version": "n8n@2.43.8",
+      "sha256": "b4921df2a9e2a2401d84f9b72d2fdd5c9ed749bac7c5cf36495d73115a065304",
+      "preservation": "Official source downloaded without modification."
+    },
+    {
+      "file": "widget-workflow-2.43.8.json",
+      "sourceUrl": "https://raw.githubusercontent.com/n8n-io/n8n/n8n%402.43.8/packages/frontend/%40n8n/chat/resources/workflow.json",
+      "version": "n8n@2.43.8",
+      "sha256": "f90339ad7b103c64ec8b92dc6d950bb6f02fea279dcb960dbea2e82ba4c7fb1b",
+      "preservation": "Official source downloaded without modification."
+    },
+    {
+      "file": "widget-api-generic-2.43.8.ts",
+      "sourceUrl": "https://raw.githubusercontent.com/n8n-io/n8n/n8n%402.43.8/packages/frontend/%40n8n/chat/src/api/generic.ts",
+      "version": "n8n@2.43.8",
+      "sha256": "b4d876eee867d6ba673dbf624ae8f0dc24ca4c67dc902487df3898359540d9ab",
+      "preservation": "Official source downloaded without modification."
+    },
+    {
+      "file": "widget-api-message-2.43.8.ts",
+      "sourceUrl": "https://raw.githubusercontent.com/n8n-io/n8n/n8n%402.43.8/packages/frontend/%40n8n/chat/src/api/message.ts",
+      "version": "n8n@2.43.8",
+      "sha256": "81cbd8e43be012caf8746a9b19d2b3fa9736e1ead536c4967f78eb80f009f9f2",
+      "preservation": "Official source downloaded without modification."
+    }
+  ]
+}

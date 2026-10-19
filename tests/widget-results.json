@@ -1,0 +1,22 @@
+{
+  "scope": "Staged standalone native widget UI fixture only. RMS rendering, Thymeleaf property evaluation, real n8n/model responses, job retrieval and CV parsing remain Not Verified.",
+  "results": [
+    {
+      "check": "Native widget mounts from local pinned assets; keyboard launcher opens; English local-processing notice visible; desktop button <=56px",
+      "status": "Pass"
+    },
+    {
+      "check": "Unavailable test endpoint displays the native widget error (deliberate connection refusal fixture, not a live workflow)",
+      "status": "Pass"
+    },
+    {
+      "check": "390x844: chat panel fits viewport, launcher <=56px, no document horizontal overflow",
+      "status": "Pass"
+    },
+    {
+      "check": "All required local bundle modules load without JavaScript page errors",
+      "status": "Pass"
+    }
+  ],
+  "assetFailures": []
+}

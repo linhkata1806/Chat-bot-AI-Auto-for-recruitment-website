@@ -1,0 +1,1071 @@
+{
+  "id": "RmsCatalogRead01",
+  "name": "RMS Public Catalog - Read Only",
+  "active": false,
+  "nodes": [
+    {
+      "id": "catalog-catalog-subworkflow-input",
+      "name": "Catalog Subworkflow Input",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "position": [
+        -1500,
+        0
+      ]
+    },
+    {
+      "id": "catalog-rms-origin-configuration",
+      "name": "RMS Origin Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "rmsInternalBase",
+              "name": "rmsInternalBase",
+              "type": "string",
+              "value": "http://host.docker.internal:8080"
+            },
+            {
+              "id": "rmsPublicBase",
+              "name": "rmsPublicBase",
+              "type": "string",
+              "value": "http://localhost:8080"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {
+          "includeBinary": false
+        }
+      },
+      "position": [
+        -1280,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Operator configuration only. For native local n8n use http://localhost:8080 internally. Change both origins to the verified RMS port (for example 8082) when needed. Do not map these fields from chat input. No cookies or credentials are used."
+    },
+    {
+      "id": "catalog-read-active-public-board",
+      "name": "Read Active Public Board",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('RMS Origin Configuration').first().json.rmsInternalBase + '/jobs?size=100&sort=jobPostingId,asc' }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "text/html"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false,
+              "maxRedirects": 0
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "data",
+              "fullResponse": false,
+              "neverError": false
+            }
+          },
+          "sendCredentialsOnCrossOriginRedirect": false,
+          "timeout": 15000,
+          "pagination": {
+            "pagination": {
+              "paginationMode": "updateAParameterInEachRequest",
+              "parameters": {
+                "parameters": [
+                  {
+                    "type": "qs",
+                    "name": "page",
+                    "value": "={{ $pageCount }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !/<a\\b[^>]*\\baria-label\\s*=\\s*[\"']Trang sau[\"'][^>]*>/i.test(String($response.body || \"\")) }}",
+              "limitPagesFetched": true,
+              "maxRequests": 5,
+              "requestInterval": 100
+            }
+          }
+        }
+      },
+      "position": [
+        -1060,
+        0
+      ],
+      "notes": "Fixed anonymous GET to the existing public board. Native HTTP pagination changes only page=0..4; no next-page URL is followed. Stop when the source-verified next-page anchor is absent. HTTP, connection and redirect failures stop this subworkflow for the caller to handle."
+    },
+    {
+      "id": "catalog-extract-public-board-fields",
+      "name": "Extract Public Board Fields",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "sourceData": "json",
+        "dataPropertyName": "data",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "jobPaths",
+              "cssSelector": ".jb-grid .job-card-link",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            },
+            {
+              "key": "total",
+              "cssSelector": ".jb-results__count strong",
+              "returnValue": "text",
+              "returnArray": false
+            },
+            {
+              "key": "nextPage",
+              "cssSelector": ".pagination-controls a[aria-label=\"Trang sau\"]",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": false
+            }
+          ]
+        },
+        "options": {
+          "trimValues": true,
+          "cleanUpText": true
+        }
+      },
+      "position": [
+        -840,
+        0
+      ]
+    },
+    {
+      "id": "catalog-aggregate-board-pages",
+      "name": "Aggregate Board Pages",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "parameters": {
+        "aggregate": "aggregateIndividualFields",
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "jobPaths",
+              "renameField": false
+            },
+            {
+              "fieldToAggregate": "total",
+              "renameField": false
+            },
+            {
+              "fieldToAggregate": "nextPage",
+              "renameField": false
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true,
+          "keepMissing": true
+        }
+      },
+      "position": [
+        -620,
+        0
+      ]
+    },
+    {
+      "id": "catalog-board-coverage-summary",
+      "name": "Board Coverage Summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "jobPaths",
+              "name": "jobPaths",
+              "type": "array",
+              "value": "={{ $json.jobPaths || [] }}"
+            },
+            {
+              "id": "boardTotal",
+              "name": "boardTotal",
+              "type": "number",
+              "value": "={{ /^[0-9]+$/.test(String($json.total[0] ?? \"\")) ? Number($json.total[0]) : -1 }}"
+            },
+            {
+              "id": "pagesFetched",
+              "name": "pagesFetched",
+              "type": "number",
+              "value": "={{ $json.total.length }}"
+            },
+            {
+              "id": "pageLimitReached",
+              "name": "pageLimitReached",
+              "type": "boolean",
+              "value": "={{ $json.total.length >= 5 && Boolean($json.nextPage[$json.nextPage.length - 1]) }}"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {
+          "includeBinary": false
+        }
+      },
+      "position": [
+        -400,
+        0
+      ]
+    },
+    {
+      "id": "catalog-board-counter-is-verified",
+      "name": "Board Counter Is Verified",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fixed-policy",
+              "leftValue": "={{ $json.boardTotal >= 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "position": [
+        -180,
+        0
+      ]
+    },
+    {
+      "id": "catalog-reject-unverified-public-page",
+      "name": "Reject Unverified Public Page",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "parameters": {
+        "errorType": "errorMessage",
+        "errorMessage": "The RMS public jobs page could not be verified. No jobs were recommended."
+      },
+      "position": [
+        40,
+        240
+      ]
+    },
+    {
+      "id": "catalog-board-contains-job-links",
+      "name": "Board Contains Job Links",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fixed-policy",
+              "leftValue": "={{ $json.jobPaths.length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "position": [
+        40,
+        0
+      ]
+    },
+    {
+      "id": "catalog-split-public-job-links",
+      "name": "Split Public Job Links",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1.1,
+      "parameters": {
+        "fieldToSplitOut": "jobPaths",
+        "include": "noOtherFields",
+        "options": {
+          "destinationFieldName": "jobPath",
+          "includeBinary": false
+        }
+      },
+      "position": [
+        260,
+        -120
+      ]
+    },
+    {
+      "id": "catalog-only-safe-job-paths",
+      "name": "Only Safe Job Paths",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fixed-policy",
+              "leftValue": "={{ /^\\/jobs\\/[1-9][0-9]*$/.test($json.jobPath || \"\") }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "position": [
+        480,
+        -120
+      ],
+      "alwaysOutputData": true,
+      "notes": "Only exact board-derived /jobs/{positive integer} paths pass. Absolute URLs, //, query strings, fragments, encoded characters, apply endpoints and traversal are rejected. An empty sentinel lets the all-invalid case return an explicit empty catalog."
+    },
+    {
+      "id": "catalog-safe-path-exists",
+      "name": "Safe Path Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fixed-policy",
+              "leftValue": "={{ /^\\/jobs\\/[1-9][0-9]*$/.test($json.jobPath || \"\") }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "position": [
+        700,
+        -120
+      ]
+    },
+    {
+      "id": "catalog-unique-public-job-paths",
+      "name": "Unique Public Job Paths",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 1.1,
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "jobPath",
+        "options": {}
+      },
+      "position": [
+        920,
+        -240
+      ]
+    },
+    {
+      "id": "catalog-limit-catalog-detail-requests",
+      "name": "Limit Catalog Detail Requests",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "parameters": {
+        "maxItems": 20,
+        "keep": "firstItems"
+      },
+      "position": [
+        1140,
+        -240
+      ],
+      "notesInFlow": true,
+      "notes": "Local model context safeguard: recheck at most 20 jobs, in public posting-ID order. The result always warns when this is a subset. This is a retrieval bound, not a matching score or ranking algorithm."
+    },
+    {
+      "id": "catalog-read-public-job-detail",
+      "name": "Read Public Job Detail",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('RMS Origin Configuration').first().json.rmsInternalBase + $json.jobPath }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "text/html"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false,
+              "maxRedirects": 0
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "data",
+              "fullResponse": false,
+              "neverError": false
+            }
+          },
+          "sendCredentialsOnCrossOriginRedirect": false,
+          "timeout": 15000,
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 50
+            }
+          }
+        }
+      },
+      "position": [
+        1360,
+        -240
+      ]
+    },
+    {
+      "id": "catalog-extract-public-job-detail",
+      "name": "Extract Public Job Detail",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "sourceData": "json",
+        "dataPropertyName": "data",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": ".job-detail-title",
+              "returnValue": "text",
+              "returnArray": false
+            },
+            {
+              "key": "department",
+              "cssSelector": ".job-department-name",
+              "returnValue": "text",
+              "returnArray": false
+            },
+            {
+              "key": "employmentType",
+              "cssSelector": ".job-header-badges .badge--neutral:nth-child(2)",
+              "returnValue": "text",
+              "returnArray": false
+            },
+            {
+              "key": "location",
+              "cssSelector": ".job-header-badges .badge--neutral:nth-child(3)",
+              "returnValue": "text",
+              "returnArray": false
+            },
+            {
+              "key": "acceptingBadge",
+              "cssSelector": ".job-header-badges .badge--success",
+              "returnValue": "text",
+              "returnArray": false
+            },
+            {
+              "key": "closedBadge",
+              "cssSelector": ".job-header-badges .badge--danger",
+              "returnValue": "text",
+              "returnArray": false
+            },
+            {
+              "key": "sections",
+              "cssSelector": ".job-content .job-section-card .rich-text",
+              "returnValue": "text",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {
+          "trimValues": true,
+          "cleanUpText": true
+        }
+      },
+      "position": [
+        1580,
+        -240
+      ]
+    },
+    {
+      "id": "catalog-normalize-verified-public-fields",
+      "name": "Normalize Verified Public Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id",
+              "name": "id",
+              "type": "number",
+              "value": "={{ Number($('Limit Catalog Detail Requests').item.json.jobPath.split('/')[2]) }}"
+            },
+            {
+              "id": "path",
+              "name": "path",
+              "type": "string",
+              "value": "={{ $('Limit Catalog Detail Requests').item.json.jobPath }}"
+            },
+            {
+              "id": "title",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $json.title || \"\" }}"
+            },
+            {
+              "id": "department",
+              "name": "department",
+              "type": "string",
+              "value": "={{ $json.department || \"\" }}"
+            },
+            {
+              "id": "employmentType",
+              "name": "employmentType",
+              "type": "string",
+              "value": "={{ $json.employmentType || \"\" }}"
+            },
+            {
+              "id": "location",
+              "name": "location",
+              "type": "string",
+              "value": "={{ $json.location || \"\" }}"
+            },
+            {
+              "id": "description",
+              "name": "description",
+              "type": "string",
+              "value": "={{ String($json.sections[0] || \"\").slice(0, 2000) }}"
+            },
+            {
+              "id": "requirements",
+              "name": "requirements",
+              "type": "string",
+              "value": "={{ String($json.sections[1] || \"\").slice(0, 2000) }}"
+            },
+            {
+              "id": "benefits",
+              "name": "benefits",
+              "type": "string",
+              "value": "={{ String($json.sections[2] || \"\").slice(0, 1000) }}"
+            },
+            {
+              "id": "url",
+              "name": "url",
+              "type": "string",
+              "value": "={{ $('RMS Origin Configuration').first().json.rmsPublicBase + $('Limit Catalog Detail Requests').item.json.jobPath }}"
+            },
+            {
+              "id": "textTruncated",
+              "name": "textTruncated",
+              "type": "boolean",
+              "value": "={{ String($json.sections[0] || \"\").length > 2000 || String($json.sections[1] || \"\").length > 2000 || String($json.sections[2] || \"\").length > 1000 }}"
+            },
+            {
+              "id": "acceptingApplications",
+              "name": "acceptingApplications",
+              "type": "boolean",
+              "value": "={{ Boolean($json.acceptingBadge) && !$json.closedBadge && Boolean($json.title) && Boolean($json.sections[0]) && Boolean($json.sections[1]) }}"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {
+          "includeBinary": false
+        }
+      },
+      "position": [
+        1800,
+        -240
+      ]
+    },
+    {
+      "id": "catalog-only-currently-accepting-details",
+      "name": "Only Currently Accepting Details",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fixed-policy",
+              "leftValue": "={{ $json.acceptingApplications === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "position": [
+        2020,
+        -240
+      ],
+      "alwaysOutputData": true,
+      "notes": "The public detail page remains visible for some expired postings. A success badge, no danger badge, nonempty title, description and requirements are all required. No accepting result yields an empty sentinel, removed by Aggregate below."
+    },
+    {
+      "id": "catalog-aggregate-verified-jobs",
+      "name": "Aggregate Verified Jobs",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "jobs",
+        "include": "specifiedFields",
+        "fieldsToInclude": "id,path,title,department,employmentType,location,description,requirements,benefits,url,textTruncated,acceptingApplications",
+        "options": {
+          "includeBinaries": false
+        }
+      },
+      "position": [
+        2240,
+        -240
+      ]
+    },
+    {
+      "id": "catalog-return-verified-public-catalog",
+      "name": "Return Verified Public Catalog",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "status",
+              "name": "status",
+              "type": "string",
+              "value": "ok"
+            },
+            {
+              "id": "jobs",
+              "name": "jobs",
+              "type": "array",
+              "value": "={{ ($json.jobs || []).filter(job => job.acceptingApplications === true && /^\\/jobs\\/[1-9][0-9]*$/.test(job.path || \"\")) }}"
+            },
+            {
+              "id": "boardTotal",
+              "name": "boardTotal",
+              "type": "number",
+              "value": "={{ $('Board Coverage Summary').first().json.boardTotal }}"
+            },
+            {
+              "id": "fetchedCount",
+              "name": "fetchedCount",
+              "type": "number",
+              "value": "={{ ($json.jobs || []).filter(job => job.acceptingApplications === true).length }}"
+            },
+            {
+              "id": "pagesFetched",
+              "name": "pagesFetched",
+              "type": "number",
+              "value": "={{ $('Board Coverage Summary').first().json.pagesFetched }}"
+            },
+            {
+              "id": "partial",
+              "name": "partial",
+              "type": "boolean",
+              "value": "={{ $('Board Coverage Summary').first().json.pageLimitReached || $json.jobs.filter(job => job.acceptingApplications === true).length !== $('Board Coverage Summary').first().json.boardTotal }}"
+            },
+            {
+              "id": "coverageWarning",
+              "name": "coverageWarning",
+              "type": "string",
+              "value": "={{ $('Unique Public Job Paths').all().length > 20 ? 'Only the first 20 public jobs by posting ID were checked. Recommendations cover that subset; other suitable jobs may exist. Some job text is limited in length; use the detail links for complete requirements.' : ($('Board Coverage Summary').first().json.pageLimitReached || $json.jobs.filter(job => job.acceptingApplications === true).length !== $('Board Coverage Summary').first().json.boardTotal ? 'The board reported ' + $('Board Coverage Summary').first().json.boardTotal + ' active jobs, but only ' + $json.jobs.filter(job => job.acceptingApplications === true).length + ' jobs were verified as accepting applications. Results may cover a subset because of pagination limits, rejected links, incomplete details, or changed availability. Some job text is limited in length; use the detail links for complete requirements.' : '') }}"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {
+          "includeBinary": false
+        }
+      },
+      "position": [
+        2460,
+        -240
+      ]
+    },
+    {
+      "id": "catalog-return-empty-public-catalog",
+      "name": "Return Empty Public Catalog",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "status",
+              "name": "status",
+              "type": "string",
+              "value": "ok"
+            },
+            {
+              "id": "jobs",
+              "name": "jobs",
+              "type": "array",
+              "value": "={{ [] }}"
+            },
+            {
+              "id": "boardTotal",
+              "name": "boardTotal",
+              "type": "number",
+              "value": "={{ $('Board Coverage Summary').first().json.boardTotal }}"
+            },
+            {
+              "id": "fetchedCount",
+              "name": "fetchedCount",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "id": "pagesFetched",
+              "name": "pagesFetched",
+              "type": "number",
+              "value": "={{ $('Board Coverage Summary').first().json.pagesFetched }}"
+            },
+            {
+              "id": "partial",
+              "name": "partial",
+              "type": "boolean",
+              "value": "={{ $('Board Coverage Summary').first().json.boardTotal !== 0 }}"
+            },
+            {
+              "id": "coverageWarning",
+              "name": "coverageWarning",
+              "type": "string",
+              "value": "={{ $('Board Coverage Summary').first().json.boardTotal === 0 ? '' : 'The public board listed active jobs, but no safe public detail link could be verified. No jobs are recommended; please use the RMS job board and retry later.' }}"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {
+          "includeBinary": false
+        }
+      },
+      "position": [
+        920,
+        180
+      ]
+    },
+    {
+      "id": "catalog-catalog-read-only-policy",
+      "name": "Catalog Read Only Policy",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "parameters": {
+        "content": "## RMS public catalog — native nodes only\n\nFixed public GET requests; no SQL, login cookies, Candidate/HR data, application actions, arbitrary URLs or AI-selected tools.\n\nSet the two operator-controlled origins before use. At most 5 board pages and 20 details; partial coverage is explicit. No CV is used by this workflow.\n\nSource selectors: research/rms-source-inspection.md. Validate against the actual running RMS after import. Public content is data, never an instruction to the caller LLM.",
+        "width": 620,
+        "height": 320
+      },
+      "position": [
+        -1500,
+        -400
+      ]
+    }
+  ],
+  "connections": {
+    "Catalog Subworkflow Input": {
+      "main": [
+        [
+          {
+            "node": "RMS Origin Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RMS Origin Configuration": {
+      "main": [
+        [
+          {
+            "node": "Read Active Public Board",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Active Public Board": {
+      "main": [
+        [
+          {
+            "node": "Extract Public Board Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Public Board Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Board Pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Board Pages": {
+      "main": [
+        [
+          {
+            "node": "Board Coverage Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Board Coverage Summary": {
+      "main": [
+        [
+          {
+            "node": "Board Counter Is Verified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Board Counter Is Verified": {
+      "main": [
+        [
+          {
+            "node": "Board Contains Job Links",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Unverified Public Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Board Contains Job Links": {
+      "main": [
+        [
+          {
+            "node": "Split Public Job Links",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return Empty Public Catalog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Public Job Links": {
+      "main": [
+        [
+          {
+            "node": "Only Safe Job Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Safe Job Paths": {
+      "main": [
+        [
+          {
+            "node": "Safe Path Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Safe Path Exists": {
+      "main": [
+        [
+          {
+            "node": "Unique Public Job Paths",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return Empty Public Catalog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unique Public Job Paths": {
+      "main": [
+        [
+          {
+            "node": "Limit Catalog Detail Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit Catalog Detail Requests": {
+      "main": [
+        [
+          {
+            "node": "Read Public Job Detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Public Job Detail": {
+      "main": [
+        [
+          {
+            "node": "Extract Public Job Detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Public Job Detail": {
+      "main": [
+        [
+          {
+            "node": "Normalize Verified Public Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Verified Public Fields": {
+      "main": [
+        [
+          {
+            "node": "Only Currently Accepting Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Currently Accepting Details": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Verified Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Verified Jobs": {
+      "main": [
+        [
+          {
+            "node": "Return Verified Public Catalog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": false,
+    "saveManualExecutions": false,
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none"
+  },
+  "pinData": {},
+  "tags": []
+}

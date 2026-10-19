@@ -1,0 +1,48 @@
+{
+  "package": "@n8n/chat",
+  "version": "1.42.6",
+  "source": "https://registry.npmjs.org/@n8n/chat/-/chat-1.42.6.tgz",
+  "note": "All runtime vendor files and license files copied byte-for-byte from the npm package. Four mjs imports are required by the bundle.",
+  "files": [
+    {
+      "file": "chat.bundle.es.js",
+      "sha256": "9a8d0674783fc2141d69f4b1669430479d626b1bbfbd5603139b54e40ce3e89f",
+      "size": 1732053
+    },
+    {
+      "file": "chunk-CDizZjoO.mjs",
+      "sha256": "1dba040a8abb1ce342b973a456ed92d007552f39618b0fa1f760b988682610df",
+      "size": 1121
+    },
+    {
+      "file": "en-C7o7sP3N-Biu2kDyR.mjs",
+      "sha256": "1eebde61b053fc0e9a2de1322d0465f27245099e49bfcc16ac7cc835a9734e77",
+      "size": 221387
+    },
+    {
+      "file": "LICENSE_EE.md",
+      "sha256": "6110c69fd3b92928328a89e863dc2c862ea449f2335c352a9c4a137a36b13040",
+      "size": 1879
+    },
+    {
+      "file": "LICENSE.md",
+      "sha256": "d2f621f59aa4c10eab79b6333e59d9d3d5b53307dcfd16dbd75e40e679e84965",
+      "size": 4445
+    },
+    {
+      "file": "node-icons-CaKBLFvs-Cglmldep.mjs",
+      "sha256": "0c918ffbbc4227b1dbea9d347d9ca51351cb6457d7bf930b28a3d16d616e7f29",
+      "size": 50423
+    },
+    {
+      "file": "style.css",
+      "sha256": "3baa47882f01301eae821c71fcf15e58c0cdc22a682df75b6f0253bbe1de2b8c",
+      "size": 34312
+    },
+    {
+      "file": "vue.runtime.esm-bundler-V2_kSlNq.mjs",
+      "sha256": "c234c59b8dc2b994673389daaee5e14262f02b2b8b34860d0ac8a886eec16bc8",
+      "size": 144215
+    }
+  ]
+}
