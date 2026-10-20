@@ -1,4 +1,4 @@
-import { createChat } from '../vendor/n8n-chat/1.42.6/chat.bundle.es.js';
+import { createChat } from './vendor/n8n-chat/1.42.6/chat.bundle.es.js';
 
 const loader = document.querySelector('[data-rms-chat-loader]');
 const mountId = 'rms-recruitment-chat';

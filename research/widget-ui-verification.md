@@ -2,6 +2,8 @@
 
 Review date: 2026-10-19 (Asia/Saigon).
 
+Rechecked on 2026-10-20 after moving vendor files to the existing public `/js/vendor/**` location: all four UI fixture checks passed again. The eight vendor files remain byte-for-byte unchanged; only the initializer and fragment asset references changed.
+
 **Reviewer disposition: Ship at standalone UI-fixture scope only. No material findings in the reviewed scope.** This is evidence for the staged native widget extension, not acceptance of the RMS or AI integration.
 
 ## Incumbent visual world

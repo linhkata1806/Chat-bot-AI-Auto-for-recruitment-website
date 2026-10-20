@@ -158,6 +158,8 @@ Trong workspace bàn giao hiện tại, runtime đã được cài và hai workf
 powershell -NoProfile -File .\integration\start-local.ps1 -Import
 ```
 
+Trong phiên ngày **2026-10-20**, n8n đã được khởi động tại [http://localhost:5678](http://localhost:5678); health, readiness và editor đều trả HTTP 200. Nếu instance này còn chạy, mở địa chỉ đó để cấu hình, không khởi động instance thứ hai cùng cổng. Workflow chat chưa được publish/model chưa được cấu hình.
+
 Không cần chạy `npm install` trong source RMS hoặc nâng dependency Java. `npm.cmd` được dùng để tránh PowerShell shim `.ps1` bị chặn bởi execution policy.
 
 ## Import và cấu hình workflow
@@ -245,9 +247,11 @@ Trong checkout `../SWP_RMS_Group-2`:
 | Fragment mới, điều khiển bằng biến môi trường | `src/main/resources/templates/fragments/rms-chat.html` |
 | Khởi tạo widget nguyên bản | `src/main/resources/static/js/rms-chat.js` |
 | Theme và reset chỉ trong vùng widget | `src/main/resources/static/css/rms-chat.css` |
-| 8 file vendor nguyên bản, có license | `src/main/resources/static/vendor/n8n-chat/1.42.6/` |
+| 8 file vendor nguyên bản, có license | `src/main/resources/static/js/vendor/n8n-chat/1.42.6/` |
 
 Manifest ghi đầy đủ từng file và SHA-256. Bản gốc shared topbar trước khi thêm include nằm trong `.runtime/backups/`. Không có thay đổi Java, Spring Security, JDBC configuration, database schema hoặc dependency RMS.
+
+Vendor được đặt dưới `/js/vendor/**` để nằm trong static locations đã được Spring Security cho phép ẩn danh. Không đặt ở `/vendor/**` nếu chưa có public rule tương ứng; bộ tích hợp không thêm rule hoặc thay authentication flow.
 
 Để áp dụng bộ nhúng trên một checkout tương thích khác, kiểm tra trước rồi chạy script additive:
 
@@ -284,7 +288,7 @@ node --test .\tests\config-and-guards.test.mjs
 
 Chúng không gọi LLM, không truy vấn DB và không chứng minh chatbot trả lời đúng. Bộ test thực tế và trạng thái được ghi trong [TEST-RESULTS.md](docs/TEST-RESULTS.md).
 
-Kết quả bổ sung đã ghi nhận: [4 kiểm tra widget fixture](tests/widget-results.json), [19 assertions render Thymeleaf thực tế ở engine độc lập](tests/thymeleaf-fragment-results.md). Chúng không thay thế việc chạy đầy đủ Spring Boot/RMS và model. Hướng dẫn chạy lại UI fixture nằm trong [báo cáo giao diện](research/widget-ui-verification.md).
+Kết quả bổ sung đã ghi nhận: [4 kiểm tra widget fixture](tests/widget-results.json), [19 assertions render Thymeleaf thực tế ở engine độc lập](tests/thymeleaf-fragment-results.md), [native PDF smoke trên n8n](tests/native-results.json). PDF tổng hợp được trích 275 ký tự, có nội dung kỳ vọng và qua readability gate thực tế. Các kiểm tra này chưa chứng minh Embedded multipart hoặc một cuộc hội thoại hoàn chỉnh với RMS/model. Hướng dẫn chạy lại UI fixture nằm trong [báo cáo giao diện](research/widget-ui-verification.md).
 
 ### Checklist nghiệm thu với môi trường thật
 
@@ -313,6 +317,7 @@ Kết quả bổ sung đã ghi nhận: [4 kiểm tra widget fixture](tests/widge
 | PDF scan không đọc được | Export CV với lớp text. OCR cloud đã được loại bỏ để không tự gửi CV ra bên ngoài. |
 | DOCX không upload được | Bản pinned không hỗ trợ DOCX trong Extract From File; chuyển sang PDF. |
 | PowerShell chặn npm.ps1 | Dùng `npm.cmd` như các lệnh ở trên. |
+| Cảnh báo Python task runner thiếu virtual environment | Các workflow bàn giao dùng JS/native nodes; native PDF smoke đã chạy với JS Task Runner. Không cần thêm Python backend cho tích hợp này. Kiểm tra health và lỗi node thực tế trước khi thay cấu hình. |
 
 ## Quyền riêng tư và giới hạn
 

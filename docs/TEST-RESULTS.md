@@ -1,6 +1,6 @@
 # Kết quả kiểm thử tích hợp RMS Chatbot
 
-Ngày ghi nhận: **2026-10-19**, múi giờ Asia/Saigon. Báo cáo chỉ mô tả kiểm tra đã thực hiện; chưa đáp ứng Definition of Done end-to-end.
+Đợt kiểm tra đầu: **2026-10-19**; bổ sung và kiểm tra lại: **2026-10-20**, múi giờ Asia/Saigon. Báo cáo chỉ mô tả kiểm tra đã thực hiện; chưa đáp ứng Definition of Done end-to-end.
 
 ## Kiểm tra đã chạy
 
@@ -13,8 +13,10 @@ Ngày ghi nhận: **2026-10-19**, múi giờ Asia/Saigon. Báo cáo chỉ mô t�
 | Guard input/upload + format/ID và cấu hình read-only | Pass — 9/9 | `node --test tests/config-and-guards.test.mjs`; fixture tổng hợp, không có CV người thật. |
 | Widget native trên standalone fixture desktop/mobile | Pass — 4 checks | Local vendor assets, Enter mở chat, lỗi kết nối native, viewport 1440×900/390×844. [Kết quả](../tests/widget-results.json). |
 | Render fragment/shared topbar thật bằng engine Thymeleaf độc lập | Pass — 19 assertions | Default tắt, bật với từng flag, context path và tên env Spring; không chạy Spring Boot/DB. [Bằng chứng](../tests/thymeleaf-fragment-results.md). |
-| Native PDF smoke bằng n8n CLI | Đang đối chiếu output / chưa Pass | Workflow kiểm tra riêng, PDF tổng hợp không có PII. Exit code 0 không được coi là đủ bằng chứng trích xuất; xem [native-results.json](../tests/native-results.json). |
-| Kiểm tra dịch vụ local | Not Verified cho chức năng | Các GET tới localhost:8080/8081/8082/5678/11434 bị từ chối kết nối trong phiên kiểm tra. |
+| Native PDF smoke bằng n8n CLI | Pass | PDF tổng hợp: production validator chấp nhận; native parser trích 275 ký tự, có text kỳ vọng; production readability gate đi nhánh true. Kết quả JSON đã được đối chiếu, không chỉ exit code. [Bằng chứng](../tests/native-results.json). |
+| Public static asset paths | Pass — 8 assets + negative control | Matcher `PathRequest.toStaticResources().atCommonLocations()` của Spring Boot 3.5.16 chấp nhận toàn bộ `/js/vendor/**`; từ chối đường dẫn `/vendor/**` cũ. Không sửa SecurityConfig. Runner: `tests/verify-static-paths.ps1`. |
+| n8n local HTTP | Pass | Ngày 2026-10-20: `/healthz`, `/healthz/readiness`, `/` tại loopback5678 đều HTTP 200. [Bằng chứng](../tests/local-runtime-results.json). Không chứng minh workflow chat đã publish hoặc model hoạt động. |
+| RMS/Ollama local | Not Verified cho chức năng | Ngày 2026-10-20: GET tại RMS8080/8081/8082 và Ollama11434 đều bị từ chối kết nối. |
 
 ## Nghiệm thu chức năng bắt buộc
 
@@ -23,7 +25,7 @@ Ngày ghi nhận: **2026-10-19**, múi giờ Asia/Saigon. Báo cáo chỉ mô t�
 | 1 | Ask for active jobs | Not Tested / Not Verified | RMS chạy, catalog workflow chạy thành công, local model. |
 | 2 | Search jobs by skills | Not Tested / Not Verified | RMS catalog thật + model. |
 | 3 | Ask for requirements/JD/department | Not Tested / Not Verified | Runtime HTML extraction + model. |
-| 4 | Upload sample PDF CV qua widget | Not Tested / Not Verified | n8n Embedded multipart + parser chạy thực. Unit guard không thay thế kiểm tra này. |
+| 4 | Upload sample PDF CV qua widget | Not Tested / Not Verified qua widget | Native validator/parser/readability gate đã Pass với PDF tổng hợp qua CLI; Embedded multipart chưa được kiểm thử. |
 | 5 | Recommend jobs dựa trên CV và giải thích | Not Tested / Not Verified | PDF extraction, RMS thật, Ollama và model. |
 | 6 | Follow-up “the first one” | Not Tested / Not Verified | Simple Memory và model chạy cùng phiên. |
 | 7 | Loại job Closed/unpublished/future/expired | Not Verified runtime | Source query/badge đã kiểm tra; cần fixtures trên RMS test. |
@@ -36,6 +38,8 @@ Ngày ghi nhận: **2026-10-19**, múi giờ Asia/Saigon. Báo cáo chỉ mô t�
 ## File áp dụng
 
 Đã thêm một dòng include vào shared public topbar và 11 file widget/theme/vendor mới. Mặc định tắt cho đến khi cấu hình xong. Chi tiết và SHA-256: [rms-files-manifest.json](../integration/rms-files-manifest.json). Diff tracked của RMS chỉ có một dòng thêm tại thời điểm đối chiếu; các file mới được liệt kê riêng trong Git status.
+
+Ngày 2026-10-20 đã chuyển đúng tám vendor asset sang `static/js/vendor/n8n-chat/1.42.6/`, sửa hai tham chiếu loader/fragment và chạy lại 4 kiểm tra UI + 19 assertions Thymeleaf. Nguyên nhân: `/vendor/**` không nằm trong common-static matcher được cấu hình public của RMS. Vendor giữ nguyên bytes/license; không có thay đổi auth hay dữ liệu nghiệp vụ.
 
 ## Giới hạn của bằng chứng
 

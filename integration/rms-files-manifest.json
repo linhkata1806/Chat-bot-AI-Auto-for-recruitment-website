@@ -13,52 +13,52 @@
     {
       "path": "src/main/resources/static/js/rms-chat.js",
       "action": "add",
-      "sha256": "3170c197350a84ad0e7ffd5a15ec3005588c6fc9b680903d88753eda8d42fcfd"
+      "sha256": "46c708f66f6dc1918e554878fe3e73ab16abc37108407c7e03e599f6337bccd2"
     },
     {
-      "path": "src/main/resources/static/vendor/n8n-chat/1.42.6/chat.bundle.es.js",
+      "path": "src/main/resources/static/js/vendor/n8n-chat/1.42.6/chat.bundle.es.js",
       "action": "add",
       "sha256": "9a8d0674783fc2141d69f4b1669430479d626b1bbfbd5603139b54e40ce3e89f"
     },
     {
-      "path": "src/main/resources/static/vendor/n8n-chat/1.42.6/chunk-CDizZjoO.mjs",
+      "path": "src/main/resources/static/js/vendor/n8n-chat/1.42.6/chunk-CDizZjoO.mjs",
       "action": "add",
       "sha256": "1dba040a8abb1ce342b973a456ed92d007552f39618b0fa1f760b988682610df"
     },
     {
-      "path": "src/main/resources/static/vendor/n8n-chat/1.42.6/en-C7o7sP3N-Biu2kDyR.mjs",
+      "path": "src/main/resources/static/js/vendor/n8n-chat/1.42.6/en-C7o7sP3N-Biu2kDyR.mjs",
       "action": "add",
       "sha256": "1eebde61b053fc0e9a2de1322d0465f27245099e49bfcc16ac7cc835a9734e77"
     },
     {
-      "path": "src/main/resources/static/vendor/n8n-chat/1.42.6/LICENSE_EE.md",
+      "path": "src/main/resources/static/js/vendor/n8n-chat/1.42.6/LICENSE_EE.md",
       "action": "add",
       "sha256": "6110c69fd3b92928328a89e863dc2c862ea449f2335c352a9c4a137a36b13040"
     },
     {
-      "path": "src/main/resources/static/vendor/n8n-chat/1.42.6/LICENSE.md",
+      "path": "src/main/resources/static/js/vendor/n8n-chat/1.42.6/LICENSE.md",
       "action": "add",
       "sha256": "d2f621f59aa4c10eab79b6333e59d9d3d5b53307dcfd16dbd75e40e679e84965"
     },
     {
-      "path": "src/main/resources/static/vendor/n8n-chat/1.42.6/node-icons-CaKBLFvs-Cglmldep.mjs",
+      "path": "src/main/resources/static/js/vendor/n8n-chat/1.42.6/node-icons-CaKBLFvs-Cglmldep.mjs",
       "action": "add",
       "sha256": "0c918ffbbc4227b1dbea9d347d9ca51351cb6457d7bf930b28a3d16d616e7f29"
     },
     {
-      "path": "src/main/resources/static/vendor/n8n-chat/1.42.6/style.css",
+      "path": "src/main/resources/static/js/vendor/n8n-chat/1.42.6/style.css",
       "action": "add",
       "sha256": "3baa47882f01301eae821c71fcf15e58c0cdc22a682df75b6f0253bbe1de2b8c"
     },
     {
-      "path": "src/main/resources/static/vendor/n8n-chat/1.42.6/vue.runtime.esm-bundler-V2_kSlNq.mjs",
+      "path": "src/main/resources/static/js/vendor/n8n-chat/1.42.6/vue.runtime.esm-bundler-V2_kSlNq.mjs",
       "action": "add",
       "sha256": "c234c59b8dc2b994673389daaee5e14262f02b2b8b34860d0ac8a886eec16bc8"
     },
     {
       "path": "src/main/resources/templates/fragments/rms-chat.html",
       "action": "add",
-      "sha256": "d12de744a14dfc6541732c97d95d1075ca94bd61fd104e2299115675bffe33c5"
+      "sha256": "6eda30f5db8378c3ce9f416351a170563a1f796dd2ce1087615df7ea8e8cc4f3"
     }
   ]
 }

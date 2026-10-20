@@ -1,0 +1,21 @@
+{
+  "checkedDate": "2026-10-20",
+  "scope": "Local n8n editor and health only; no RMS/model calls",
+  "endpoints": [
+    {
+      "path": "/healthz",
+      "status": 200,
+      "bytes": 15
+    },
+    {
+      "path": "/healthz/readiness",
+      "status": 200,
+      "bytes": 15
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 1708
+    }
+  ]
+}

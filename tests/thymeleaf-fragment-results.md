@@ -2,6 +2,8 @@
 
 Date: 2026-10-19 (Asia/Saigon).
 
+Rechecked on 2026-10-20 after moving widget vendor assets to `/js/vendor/**`: all 19 assertions passed again against the actual RMS templates.
+
 **PASS — 19 assertions against the actual RMS templates.**
 
 The check used Java 21, Spring Framework 6.2.19, Thymeleaf / thymeleaf-spring6 3.1.5.RELEASE, cached Spring mock servlet classes, Jakarta Servlet API 6.0.0, Attoparser 2.0.7.RELEASE, Unbescape 1.1.6.RELEASE, and SLF4J API 2.0.20. It constructed only a `StaticWebApplicationContext`, `SpringTemplateEngine`, and mock web exchange. It did not load RMS application properties, Spring Boot application classes, repositories, data sources, seeders, an HTTP server, or a database connection. Configuration used synthetic values only.
@@ -23,7 +25,7 @@ This check initially exposed a Thymeleaf restricted-expression error when bean a
 
 Verified source SHA-256:
 
-- `fragments/rms-chat.html`: `D12DE744A14DFC6541732C97D95D1075CA94BD61FD104E2299115675BFFE33C5`.
+- `fragments/rms-chat.html`: `6EDA30F5DB8378C3CE9F416351A170563A1F796DD2CE1087615DF7EA8E8CC4F3`.
 - `fragments/layout/public-topbar.html`: `38BB7FDF1CF7874A36459F029FB47C929E682FEC41BFEEEC4640EABAEC313265`.
 
 Local verification harness: `.runtime/template-check/FragmentRenderCheck.java`; runner: `.runtime/template-check/run.ps1`. From this chatbot workspace, run `& ./.runtime/template-check/run.ps1` while the listed cached Maven dependencies remain installed. Synthetic rendered HTML and the latest result text are under `.runtime/template-check/output/`.
